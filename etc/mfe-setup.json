@@ -1,8 +1,8 @@
 [
   {
-    "name": "micro-service-template-crud-aggregate",
-    "src": "frontend/emi/micro-service-template-crud-aggregate",
-    "assets": "frontend/emi/micro-service-template-crud-aggregate/assets/micro-service-template-crud-aggregate",
+    "name": "generator-generator-management",
+    "src": "frontend/emi/generator-generator-management",
+    "assets": "frontend/emi/generator-generator-management/assets/generator-generator-management",
     "prebuildCommands": [],
     "environmentVars": {
       "_env": {

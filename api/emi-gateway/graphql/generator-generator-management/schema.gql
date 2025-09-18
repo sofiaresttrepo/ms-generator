@@ -1,0 +1,93 @@
+type CommandResponse {
+  "Response code"
+  code: Int
+  "Response message"
+  message: String
+}
+
+type GeneratorGenerator {
+  "Generator ID"
+  id: ID!
+  "name"
+  name: String!
+  "organization id"
+  organizationId: String!
+  "Generator description"
+  description: String
+  "Generator active flag"
+  active: Boolean!  
+  "object metadata"
+  metadata: GeneratorGeneratorMetadata
+}
+
+type GeneratorGeneratorMetadata {
+    createdBy: String
+		createdAt: BigInt
+		updatedBy: String
+		updatedAt: BigInt
+}
+
+type GeneratorGeneratorListing {
+  "Listing"
+  listing: [GeneratorGenerator]
+  "query total result count"
+  queryTotalResultCount: Int,  
+}
+
+
+input GeneratorGeneratorFilterInput {
+  "Name"
+  name: String
+  "organization id"
+  organizationId: String!
+  "Generator active flag"
+  active: Boolean
+}
+
+input GeneratorGeneratorPaginationInput {
+  "Page"
+  page: Int!
+  "Count"
+  count: Int!
+  "query total result count flag"
+  queryTotalResultCount: Boolean
+}
+
+input GeneratorGeneratorSortInput {
+  field: String!,
+  asc: Boolean!,
+}
+
+input GeneratorGeneratorInput {
+  "name"
+  name: String
+  "organization id"
+  organizationId: String!
+  "Generator description"
+  description: String
+  "Generator active flag"
+  active: Boolean
+}
+
+
+type Query {
+  "Get Generators filtered "
+  GeneratorGeneratorListing(filterInput: GeneratorGeneratorFilterInput, paginationInput: GeneratorGeneratorPaginationInput, sortInput: GeneratorGeneratorSortInput): GeneratorGeneratorListing
+  "Get Generator by its id"
+  GeneratorGenerator(id: ID!, organizationId: String!): GeneratorGenerator
+}
+
+type Mutation {
+  "Create a new Generator"
+  GeneratorCreateGenerator(input: GeneratorGeneratorInput!): GeneratorGenerator
+  "Update an Generator"
+  GeneratorUpdateGenerator(id: ID!, input: GeneratorGeneratorInput!, merge: Boolean!): GeneratorGenerator  
+  "Deletes an Generator"
+  GeneratorDeleteGenerators(ids: [ID]!): CommandResponse  
+}
+
+
+type Subscription {
+  "This events is triggered when a generator updated or deleted"
+  GeneratorGeneratorModified(id: ID!): GeneratorGenerator
+}
