@@ -19,6 +19,10 @@ export const MicroFrontendConfig = {
             component: React.lazy(() => import('./generators/Generators'))
         },
         {
+            path: '/generator-mng/vehicle-generator',
+            component: React.lazy(() => import('./vehicle/VehicleGenerator'))
+        },
+        {
             path: '/generator-mng',
             component: () => <Redirect to="/generator-mng/generators" />
         }
@@ -29,14 +33,25 @@ export const MicroFrontendConfig = {
             'type': 'collapse',
             'icon': 'settings',
             'priority': 100,
-            children: [{
-                'id': 'generator-generator-management',
-                'type': 'item',
-                'icon': 'business',
-                'url': '/generator-mng',
-                'priority': 2000,
-                auth
-            }]
+            auth: ["GENERATOR_READ"],
+            children: [
+                {
+                    'id': 'generator-generator-management',
+                    'type': 'item',
+                    'icon': 'business',
+                    'url': '/generator-mng',
+                    'priority': 2000,
+                    auth
+                },
+                {
+                    'id': 'vehicle-generator',
+                    'type': 'item',
+                    'icon': 'directions_car',
+                    'url': '/generator-mng/vehicle-generator',
+                    'priority': 2001,
+                    auth
+                }
+            ]
         }
     ],
     i18nLocales: i18n.locales

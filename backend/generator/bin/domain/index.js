@@ -7,7 +7,8 @@ const { concat } = require("rxjs");
  * Please add any new domain to this list
  */
 const domains = {
-  generator: require("./generator")
+  generator: require("./generator"),
+  vehicle: require("./vehicle")
 };
 
 module.exports = {

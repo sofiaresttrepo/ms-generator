@@ -76,6 +76,12 @@ module.exports = {
         },
         GeneratorGenerator(root, args, context) {
             return sendToBackEndHandler$(root, args, context, READ_ROLES, 'query', 'Generator', 'GeneratorGenerator').toPromise();
+        },
+        VehicleVehicleListing(root, args, context) {
+            return sendToBackEndHandler$(root, args, context, READ_ROLES, 'query', 'Vehicle', 'VehicleVehicleListing').toPromise();
+        },
+        VehicleVehicle(root, args, context) {
+            return sendToBackEndHandler$(root, args, context, READ_ROLES, 'query', 'Vehicle', 'VehicleVehicle').toPromise();
         }
     },
 
@@ -89,6 +95,12 @@ module.exports = {
         },
         GeneratorDeleteGenerators(root, args, context) {
             return sendToBackEndHandler$(root, args, context, WRITE_ROLES, 'mutation', 'Generator', 'GeneratorDeleteGenerators').toPromise();
+        },
+        VehicleStartGeneration(root, args, context) {
+            return sendToBackEndHandler$(root, args, context, WRITE_ROLES, 'mutation', 'Vehicle', 'VehicleStartGeneration', 5000).toPromise();
+        },
+        VehicleStopGeneration(root, args, context) {
+            return sendToBackEndHandler$(root, args, context, WRITE_ROLES, 'mutation', 'Vehicle', 'VehicleStopGeneration', 5000).toPromise();
         },
     },
 
@@ -114,6 +126,25 @@ module.exports = {
                         : false;
                 }
             )
+        },
+        VehicleVehicleGenerated: {
+            subscribe: withFilter(
+                (payload, variables, context, info) => {
+                    //Checks the roles of the user, if the user does not have at least one of the required roles, an error will be thrown
+                    RoleValidator.checkAndThrowError(
+                        context.authToken.realm_access.roles,
+                        READ_ROLES,
+                        "Vehicle",
+                        "VehicleVehicleGenerated",
+                        PERMISSION_DENIED_ERROR_CODE,
+                        "Permission denied"
+                    );
+                    return pubsub.asyncIterator("VehicleVehicleGenerated");
+                },
+                (payload, variables, context, info) => {
+                    return payload ? true : false;
+                }
+            )
         }
     }
 };
@@ -125,6 +156,15 @@ const eventDescriptors = [
     {
         backendEventName: "GeneratorGeneratorModified",
         gqlSubscriptionName: "GeneratorGeneratorModified",
+        dataExtractor: evt => evt.data, // OPTIONAL, only use if needed
+        onError: (error, descriptor) =>
+            console.log(`Error processing ${descriptor.backendEventName}`), // OPTIONAL, only use if needed
+        onEvent: (evt, descriptor) =>
+            console.log(`Event of type  ${descriptor.backendEventName} arrived`) // OPTIONAL, only use if needed
+    },
+    {
+        backendEventName: "VehicleVehicleGenerated",
+        gqlSubscriptionName: "VehicleVehicleGenerated",
         dataExtractor: evt => evt.data, // OPTIONAL, only use if needed
         onError: (error, descriptor) =>
             console.log(`Error processing ${descriptor.backendEventName}`), // OPTIONAL, only use if needed

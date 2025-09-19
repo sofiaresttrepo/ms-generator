@@ -70,11 +70,69 @@ input GeneratorGeneratorInput {
 }
 
 
+type VehicleVehicle {
+  "Vehicle ID"
+  id: ID!
+  "Vehicle type"
+  type: String!
+  "Power source"
+  powerSource: String!
+  "Horsepower"
+  hp: Int!
+  "Year"
+  year: Int!
+  "Top speed"
+  topSpeed: Int!
+  "Timestamp"
+  timestamp: BigInt!
+}
+
+type VehicleVehicleListing {
+  "Listing"
+  listing: [VehicleVehicle]
+  "query total result count"
+  queryTotalResultCount: Int,  
+}
+
+input VehicleVehicleFilterInput {
+  "Type"
+  type: String
+  "Power source"
+  powerSource: String
+  "Year"
+  year: Int
+}
+
+input VehicleVehiclePaginationInput {
+  "Page"
+  page: Int!
+  "Count"
+  count: Int!
+  "query total result count flag"
+  queryTotalResultCount: Boolean
+}
+
+input VehicleVehicleSortInput {
+  field: String!,
+  asc: Boolean!,
+}
+
+type CommandResponse {
+  "Response code"
+  code: Int
+  "Response message"
+  message: String
+}
+
 type Query {
   "Get Generators filtered "
   GeneratorGeneratorListing(filterInput: GeneratorGeneratorFilterInput, paginationInput: GeneratorGeneratorPaginationInput, sortInput: GeneratorGeneratorSortInput): GeneratorGeneratorListing
   "Get Generator by its id"
   GeneratorGenerator(id: ID!, organizationId: String!): GeneratorGenerator
+  "Get Vehicles filtered "
+  VehicleVehicleListing(filterInput: VehicleVehicleFilterInput, paginationInput: VehicleVehiclePaginationInput, sortInput: VehicleVehicleSortInput): VehicleVehicleListing
+  "Get Vehicle by its id"
+  VehicleVehicle(id: ID!): VehicleVehicle
 }
 
 type Mutation {
@@ -84,10 +142,16 @@ type Mutation {
   GeneratorUpdateGenerator(id: ID!, input: GeneratorGeneratorInput!, merge: Boolean!): GeneratorGenerator  
   "Deletes an Generator"
   GeneratorDeleteGenerators(ids: [ID]!): CommandResponse  
+  "Start vehicle generation"
+  VehicleStartGeneration: CommandResponse
+  "Stop vehicle generation"
+  VehicleStopGeneration: CommandResponse
 }
 
 
 type Subscription {
   "This events is triggered when a generator updated or deleted"
   GeneratorGeneratorModified(id: ID!): GeneratorGenerator
+  "This events is triggered when a vehicle is generated"
+  VehicleVehicleGenerated: VehicleVehicle
 }

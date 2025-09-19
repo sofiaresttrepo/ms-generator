@@ -1,7 +1,7 @@
 export default {
   navigation: {
-    'settings': 'Configuraciones',
     'generator-generator-management': 'Generators',
+    'vehicle-generator': 'Generador de Vehículos',
   },
   generators: {
     generators: 'Generators',
