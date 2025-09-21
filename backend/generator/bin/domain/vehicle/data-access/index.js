@@ -1,5 +1,7 @@
 const VehicleDA = require('./VehicleDA');
 
 module.exports = {
-    VehicleDA
+    VehicleDA,
+    start$: VehicleDA.start$(),
+    stop$: VehicleDA.stop$()
 };

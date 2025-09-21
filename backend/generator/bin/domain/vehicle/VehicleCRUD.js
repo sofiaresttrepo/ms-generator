@@ -238,6 +238,12 @@ class VehicleCRUD {
       error: (err) => ConsoleLogger.e("Error publishing vehicle to MQTT:", err)
     });
 
+    // CRITICAL: Publish to Materialized View for WebSocket notifications
+    broker.send$(MATERIALIZED_VIEW_TOPIC, "VehicleVehicleGenerated", event).subscribe({
+      next: () => ConsoleLogger.i(`Vehicle published to MV for WebSocket: ${vehicle.aid}`),
+      error: (err) => ConsoleLogger.e("Error publishing vehicle to MV:", err)
+    });
+
     // Emit event sourcing event
     const esEvent = new Event({
       eventType: "VehicleGenerated",

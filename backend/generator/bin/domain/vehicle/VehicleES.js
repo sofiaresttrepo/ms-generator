@@ -1,7 +1,7 @@
 'use strict'
 
-const { iif } = require("rxjs");
-const { tap } = require('rxjs/operators');
+const { iif, of } = require("rxjs");
+const { tap, catchError } = require('rxjs/operators');
 const { ConsoleLogger } = require('@nebulae/backend-node-tools').log;
 
 const VehicleDA = require("./data-access/VehicleDA");
@@ -62,7 +62,11 @@ class VehicleES {
         ];
         const aggregateData = aggregateDataMapper[etv](data);
         return VehicleDA.updateVehicleFromRecovery$(aid, aggregateData, av).pipe(
-            tap(() => ConsoleLogger.i(`VehicleES.handleVehicleGenerationStarted: aid=${aid}, timestamp=${timestamp}`))
+            tap(() => ConsoleLogger.i(`VehicleES.handleVehicleGenerationStarted: aid=${aid}, timestamp=${timestamp}`)),
+            catchError(error => {
+                ConsoleLogger.w(`VehicleES.handleVehicleGenerationStarted: MongoDB not ready, skipping event aid=${aid}: ${error.message}`);
+                return of(null); // Return empty result to continue processing
+            })
         )
     }
 
@@ -77,7 +81,11 @@ class VehicleES {
         ];
         const aggregateData = aggregateDataMapper[etv](data);
         return VehicleDA.updateVehicleFromRecovery$(aid, aggregateData, av).pipe(
-            tap(() => ConsoleLogger.i(`VehicleES.handleVehicleGenerationStopped: aid=${aid}, timestamp=${timestamp}`))
+            tap(() => ConsoleLogger.i(`VehicleES.handleVehicleGenerationStopped: aid=${aid}, timestamp=${timestamp}`)),
+            catchError(error => {
+                ConsoleLogger.w(`VehicleES.handleVehicleGenerationStopped: MongoDB not ready, skipping event aid=${aid}: ${error.message}`);
+                return of(null); // Return empty result to continue processing
+            })
         )
     }
 }

@@ -1,8 +1,8 @@
 "use strict";
 
 let mongoDB = undefined;
-const { map, mapTo } = require("rxjs/operators");
-const { of, Observable, defer } = require("rxjs");
+const { map, mapTo, catchError } = require("rxjs/operators");
+const { of, Observable, defer, throwError } = require("rxjs");
 
 const { CustomError } = require("@nebulae/backend-node-tools").error;
 
@@ -18,7 +18,30 @@ class VehicleDA {
         mongoDB = require("../../../tools/mongo-db/MongoDB").singleton();
         observer.next(`${this.name} using singleton system-wide mongo instance`);
       }
-      observer.next(`${this.name} started`);
+      
+      // Verificar que la conexión esté establecida inmediatamente
+      if (mongoDB && mongoDB.db) {
+        observer.next(`${this.name} MongoDB connection verified`);
+        observer.next(`${this.name} started`);
+        observer.complete();
+      } else {
+        // Si no está listo, esperar un poco
+        setTimeout(() => {
+          if (mongoDB && mongoDB.db) {
+            observer.next(`${this.name} MongoDB connection verified`);
+            observer.next(`${this.name} started`);
+            observer.complete();
+          } else {
+            observer.error(new Error(`${this.name} MongoDB connection not established`));
+          }
+        }, 1000);
+      }
+    });
+  }
+
+  static stop$() {
+    return Observable.create(observer => {
+      observer.next(`${this.name} stopped`);
       observer.complete();
     });
   }
@@ -27,6 +50,10 @@ class VehicleDA {
    * Gets a vehicle by its id
    */
   static getVehicle$(id) {
+    if (!mongoDB || !mongoDB.db) {
+      return throwError(new Error('MongoDB not initialized. Please ensure the database connection is established.'));
+    }
+    
     const collection = mongoDB.db.collection(CollectionName);
 
     const query = {
@@ -56,6 +83,10 @@ class VehicleDA {
   }
 
   static getVehicleList$(filter = {}, pagination = {}, sortInput) {
+    if (!mongoDB || !mongoDB.db) {
+      return throwError(new Error('MongoDB not initialized. Please ensure the database connection is established.'));
+    }
+    
     const collection = mongoDB.db.collection(CollectionName);
     const { page = 0, count = 10 } = pagination;
 
@@ -81,6 +112,10 @@ class VehicleDA {
   }
 
   static getVehicleSize$(filter = {}) {
+    if (!mongoDB || !mongoDB.db) {
+      return throwError(new Error('MongoDB not initialized. Please ensure the database connection is established.'));
+    }
+    
     const collection = mongoDB.db.collection(CollectionName);
     const query = this.generateListingQuery(filter);    
     return defer(() => collection.countDocuments(query));
@@ -131,6 +166,10 @@ class VehicleDA {
   * @param {*} Vehicle properties to update
   */
   static updateVehicleFromRecovery$(_id, properties, av) {
+    if (!mongoDB || !mongoDB.db) {
+      return throwError(new Error('MongoDB not initialized. Please ensure the database connection is established.'));
+    }
+    
     const collection = mongoDB.db.collection(CollectionName);
     return defer(() =>
       collection.updateOne(
